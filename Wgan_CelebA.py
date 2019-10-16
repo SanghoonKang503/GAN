@@ -65,17 +65,6 @@ for epoch in range(train_epoch):
     Wassestein_Distance = []
     num_iter = 0
 
-    # learning rate decay
-    """    if (epoch + 1) == 11:
-            G_optimizer.param_groups[0]['lr'] /= 10
-            D_optimizer.param_groups[0]['lr'] /= 10
-            print("learning rate change!")"""
-
-    if (epoch + 1) == 101:
-        G_optimizer.param_groups[0]['lr'] /= 10
-        D_optimizer.param_groups[0]['lr'] /= 10
-        print("learning rate change!")
-
     epoch_start_time = time.time()
     for i, (x_, _) in enumerate(train_loader):
 
