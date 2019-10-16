@@ -43,12 +43,9 @@ G_optimizer = optim.RMSprop(G.parameters(), lr=lr)
 D_optimizer = optim.RMSprop(D.parameters(), lr=lr)
 
 # results save folder
-if not os.path.isdir('CelebA_WGAN_results_3'):
-    os.mkdir('CelebA_WGAN_results_3')
-if not os.path.isdir('CelebA_WGAN_results_3/Random_results'):
-    os.mkdir('CelebA_WGAN_results_3/Random_results')
-if not os.path.isdir('CelebA_WGAN_results_3/Fixed_results'):
-    os.mkdir('CelebA_WGAN_results_3/Fixed_results')
+os.mkdir('CelebA_WGAN_results_3', exist_ok=True)
+os.mkdir('CelebA_WGAN_results_3/Random_results', exist_ok=True)
+os.mkdir('CelebA_WGAN_results_3/Fixed_results', exist_ok=True)
 
 train_hist = {}
 train_hist['D_losses'] = []
