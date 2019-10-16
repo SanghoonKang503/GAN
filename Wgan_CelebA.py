@@ -11,7 +11,7 @@ from torchvision import datasets, transforms
 from torch.autograd import Variable
 
 from sang_gan import *
-from sang_utils import *
+from sang_plot import *
 
 
 # training parameters
