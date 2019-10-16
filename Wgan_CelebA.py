@@ -63,7 +63,6 @@ for epoch in range(train_epoch):
     D_losses = []
     G_losses = []
     Wassestein_Distance = []
-    num_iter = 0
 
     epoch_start_time = time.time()
     for i, (x_, _) in enumerate(train_loader):
@@ -128,8 +127,6 @@ for epoch in range(train_epoch):
             G_losses.append(G_loss.item())
 
             Wassestein_Distance.append(Wasserstein_D.item())
-
-            num_iter += 1
 
     epoch_end_time = time.time()
     per_epoch_ptime = epoch_end_time - epoch_start_time
