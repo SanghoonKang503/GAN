@@ -14,16 +14,10 @@ from sang_gan import *
 from sang_utils import *
 
 
-fixed_z_ = torch.randn((5 * 5, 100)).view(-1, 100, 1, 1)  # fixed noise
-with torch.no_grad():
-    fixed_z_ = Variable(fixed_z_.cuda())
-
-
 # training parameters
 batch_sizes = 64
 lr = 0.00005
 train_epoch = 200
-
 img_size = 64
 
 # put image data into data_loader
@@ -70,6 +64,10 @@ train_hist['D_losses'] = []
 train_hist['G_losses'] = []
 train_hist['per_epoch_ptimes'] = []
 train_hist['total_ptime'] = []
+
+fixed_z_ = torch.randn((5 * 5, 100)).view(-1, 100, 1, 1)  # fixed noise
+with torch.no_grad():
+    fixed_z_ = Variable(fixed_z_.cuda())
 
 print('Training start!')
 start_time = time.time()
@@ -166,8 +164,11 @@ for epoch in range(train_epoch):
     p = 'CelebA_WGAN_results_3/Random_results/CelebA_WGAN_' + str(epoch + 1) + '.png'
     fixed_p = 'CelebA_WGAN_results_3/Fixed_results/CelebA_WGAN_' + str(epoch + 1) + '.png'
 
-    show_result((epoch + 1), save=True, path=p, isFix=False)
-    show_result((epoch + 1), save=True, path=fixed_p, isFix=True)
+    z_ = torch.randn((5 * 5, 100)).view(-1, 100, 1, 1)
+    with torch.no_grad():
+        z_ = Variable(z_.cuda())
+    show_result((epoch + 1), z_, save=True, path=p)
+    show_result((epoch + 1), fixed_z_, save=True, path=fixed_p)
     train_hist['D_losses'].append(torch.mean(torch.FloatTensor(D_losses)))
     train_hist['G_losses'].append(torch.mean(torch.FloatTensor(G_losses)))
     train_hist['per_epoch_ptimes'].append(per_epoch_ptime)

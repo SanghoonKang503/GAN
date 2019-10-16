@@ -4,16 +4,10 @@ import torch
 from torch.autograd import Variable
 
 
-def show_result(num_epoch, show=False, save=False, path='result.png', isFix=False):
-    z_ = torch.randn((5 * 5, 100)).view(-1, 100, 1, 1)
-    with torch.no_grad():
-        z_ = Variable(z_.cuda())
+def show_result(num_epoch, z_, show=False, save=False, path='result.png'):
 
     G.eval()
-    if isFix:
-        test_images = G(fixed_z_)
-    else:
-        test_images = G(z_)
+    test_images = G(z_)
     G.train()
 
     size_figure_grid = 5
