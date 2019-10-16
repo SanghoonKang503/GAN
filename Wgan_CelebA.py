@@ -12,28 +12,19 @@ from torch.autograd import Variable
 
 from sang_gan import *
 from sang_plot import *
+from sang_utils import *
 
 
 # training parameters
-batch_sizes = 64
 lr = 0.00005
 train_epoch = 200
 img_size = 64
 
-# put image data into data_loader
-transform = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
-])
+batch_sizes = 64
 data_dir = 'resized_celebA'  # this path depends on your computer
-dset = datasets.ImageFolder(data_dir, transform)
-train_loader = torch.utils.data.DataLoader(dset, batch_size=batch_sizes, shuffle=True)
 
-# confrimed input image size!
-temp = plt.imread(train_loader.dataset.imgs[0][0])
-if (temp.shape[0] != img_size) or (temp.shape[0] != img_size):
-    sys.stderr.write('Error! image size is not 64 x 64! run \"celebA_data_preprocess.py\" !!!')
-    sys.exit(1)
+# put image data into data_loader
+train_loader = get_train_loader(data_dir, batch_sizes, img_size)
 
 # network 선언, () number는 filter 수
 G = generator()
