@@ -6,7 +6,7 @@ import imageio
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim\
+import torch.optim as optim
 import argparse
 from torchvision import datasets, transforms
 from torch.autograd import Variable
@@ -32,7 +32,7 @@ opt= parser.parse_args()
 data_dir = 'resized_celebA'  # this path depends on your computer
 
 # put image data into data_loader
-train_loader = get_train_loader(data_dir, batch_sizes, img_size)
+train_loader = get_train_loader(data_dir, opt.batch_size, opt.img_size)
 
 # network 선언, () number는 filter 수
 G = generator()
@@ -47,8 +47,8 @@ G.cuda()
 D.cuda()
 
 # RMSprop optimizer for WGAN
-G_optimizer = optim.RMSprop(G.parameters(), lr=lr)
-D_optimizer = optim.RMSprop(D.parameters(), lr=lr)
+G_optimizer = optim.RMSprop(G.parameters(), lr=opt.lr)
+D_optimizer = optim.RMSprop(D.parameters(), lr=opt.lr)
 
 # results save folder
 os.mkdir('CelebA_WGAN_results_3', exist_ok=True)
@@ -67,7 +67,7 @@ with torch.no_grad():
 
 print('Training start!')
 start_time = time.time()
-for epoch in range(train_epoch):
+for epoch in range(opt.n_epochs):
     D_losses = []
     G_losses = []
     Wassestein_Distance = []
@@ -140,7 +140,7 @@ for epoch in range(train_epoch):
     per_epoch_ptime = epoch_end_time - epoch_start_time
 
     print('[%d/%d] - epoch time: %.2f, loss_d: %.3f, loss_g: %.3f, Wasserstein length: %.3f' % (
-    (epoch + 1), train_epoch, per_epoch_ptime, torch.mean(torch.FloatTensor(D_losses)),
+    (epoch + 1), opt.n_epochs, per_epoch_ptime, torch.mean(torch.FloatTensor(D_losses)),
     torch.mean(torch.FloatTensor(G_losses)), torch.mean(torch.FloatTensor(Wassestein_Distance))))
 
     p = 'CelebA_WGAN_results_3/Random_results/CelebA_WGAN_' + str(epoch + 1) + '.png'
@@ -160,7 +160,7 @@ total_ptime = end_time - start_time
 train_hist['total_ptime'].append(total_ptime)
 
 print("Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f" % (
-torch.mean(torch.FloatTensor(train_hist['per_epoch_ptimes'])), train_epoch, total_ptime))
+torch.mean(torch.FloatTensor(train_hist['per_epoch_ptimes'])), opt.n_epochs, total_ptime))
 print("Training finish!... save training results")
 torch.save(G.state_dict(), "CelebA_WGAN_results_3/generator_param.pkl")
 torch.save(D.state_dict(), "CelebA_WGAN_results_3/discriminator_param.pkl")
@@ -170,7 +170,7 @@ with open('CelebA_WGAN_results_3/train_hist.pkl', 'wb') as f:
 show_train_hist(train_hist, save=True, path='CelebA_WGAN_results_3/CelebA_WGAN_train_hist.png')
 
 images = []
-for e in range(train_epoch):
+for e in range(opt.n_epochs):
     img_name = 'CelebA_WGAN_results_3/Fixed_results/CelebA_WGAN_' + str(e + 1) + '.png'
     images.append(imageio.imread(img_name))
 imageio.mimsave('CelebA_WGAN_results_3/generation_animation.gif', images, fps=5)
