@@ -29,12 +29,11 @@ parser.add_argument("--lambda", type=int, default=10, help="Lambda of Gradient D
 
 opt= parser.parse_args()
 
-data_dir = 'resized_celebA'  # this path depends on your computer
-
 # put image data into data_loader
+data_dir = 'resized_celebA'  # this path depends on your computer
 train_loader = get_train_loader(data_dir, opt.batch_size, opt.img_size)
 
-# network 선언, () number는 filter 수
+# Declare G and D network
 G = generator()
 D = discriminator()
 
@@ -42,7 +41,7 @@ D = discriminator()
 G.weight_init(mean=0.0, std=0.02)
 D.weight_init(mean=0.0, std=0.02)
 
-# put G&D in cuda
+# put G and D in cuda
 G.cuda()
 D.cuda()
 
