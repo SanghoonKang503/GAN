@@ -47,8 +47,8 @@ G.cuda()
 D.cuda()
 
 # RMSprop optimizer for WGAN
-G_optimizer = optim.RMSprop(G.parameters(), lr=opt.lr)
-D_optimizer = optim.RMSprop(D.parameters(), lr=opt.lr)
+G_optimizer = optim.Adam(G.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
+D_optimizer = optim.Adam(D.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 
 # results save folder
 os.mkdir('CelebA_WGAN_results_3', exist_ok=True)
