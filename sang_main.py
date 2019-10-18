@@ -101,11 +101,11 @@ for epoch in range(opt.n_epochs):
         D_optimizer.step()
         D_losses.append(D_loss.item())
 
-
+        G_optimizer.zero_grad()
+        
         if i % opt.n_critic == 0:
 
             # train generator G
-            G.zero_grad()
 
             z_ = torch.randn((mini_batch, 100)).view(-1, 100, 1, 1)
             z_ = Variable(z_.cuda())
