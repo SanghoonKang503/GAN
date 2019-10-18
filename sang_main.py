@@ -73,21 +73,13 @@ for epoch in range(opt.n_epochs):
 
     epoch_start_time = time.time()
     for i, (x_, _) in enumerate(train_loader):
-
-        for p in D.parameters():
-            p.requires_grad=True
-
+        # Configure input
+        x_ = Variable(x_.cuda())
+        
         # train discriminator D
         D.zero_grad()
 
-        one = torch.FloatTensor([1])
-        mone = one * -1
-        one= one.cuda()
-        mone = mone.cuda()
-
         mini_batch = x_.size()[0]
-
-        x_ = Variable(x_.cuda())
 
         D_real_loss = D(x_)
         D_real_loss = D_real_loss.mean(0).view(1)
@@ -138,8 +130,8 @@ for epoch in range(opt.n_epochs):
     epoch_end_time = time.time()
     per_epoch_ptime = epoch_end_time - epoch_start_time
 
-    print('[%d/%d] - epoch time: %.2f, loss_d: %.3f, loss_g: %.3f, Wasserstein length: %.3f' % (
-    (epoch + 1), opt.n_epochs, per_epoch_ptime, torch.mean(torch.FloatTensor(D_losses)),
+    print('[%d/%d] - epoch time: %.2f, loss_d: %.3f, loss_g: %.3f, Wasserstein length: %.3f'
+          % ((epoch + 1), opt.n_epochs, per_epoch_ptime, torch.mean(torch.FloatTensor(D_losses)),
     torch.mean(torch.FloatTensor(G_losses)), torch.mean(torch.FloatTensor(Wassestein_Distance))))
 
     p = 'CelebA_WGAN_results_3/Random_results/CelebA_WGAN_' + str(epoch + 1) + '.png'
