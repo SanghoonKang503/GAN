@@ -91,16 +91,6 @@ for epoch in range(opt.n_epochs):
         fake_validity = D(fake_image)
 
 
-
-        D_real_loss = D(x_)
-        D_real_loss = D_real_loss.mean(0).view(1)
-        D_real_loss.backward(one)
-
-        fake_image = G(z)
-        D_fake_loss = D(fake_image)
-        D_fake_loss = D_fake_loss.mean(0).view(1)
-        D_fake_loss.backward(mone)
-
         D_loss=D_fake_loss-D_real_loss
         Wasserstein_D = D_real_loss - D_fake_loss
 
