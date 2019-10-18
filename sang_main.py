@@ -103,9 +103,7 @@ for epoch in range(opt.n_epochs):
 
 
         if i % opt.n_critic == 0:
-            for p in D.parameters():
-                p.requires_grad = False
-
+            
             # train generator G
             G.zero_grad()
 
