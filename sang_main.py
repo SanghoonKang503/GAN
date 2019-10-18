@@ -8,6 +8,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import argparse
+import torch.autograd as autograd
+
 from torchvision import datasets, transforms
 from torch.autograd import Variable
 
@@ -26,9 +28,9 @@ parser.add_argument("--b1", type=int, default=0.5, help="Momentum of Adam beta1"
 parser.add_argument("--b2", type=int, default=0.999, help="Momentum of Adam beta2")
 parser.add_argument("--img_size", type=int, default=64, help="Size of input Image")
 parser.add_argument("--n_critic", type=int, default=5, help="Number of training step of Discriminator")
-parser.add_argument("--lambda", type=int, default=10, help="Lambda of Gradient Descent")
 
 opt= parser.parse_args()
+lamda_gp = 10
 
 # put image data into data_loader
 data_dir = 'resized_celebA'  # this path depends on your computer
@@ -90,8 +92,10 @@ for epoch in range(opt.n_epochs):
         real_validity = D(real_image)
         fake_validity = D(fake_image)
 
+        gradient_penalty = calculate_gradient_penalty(D, real_image, fake_image, lamda_gp)
 
-        D_loss=D_fake_loss-D_real_loss
+
+        D_loss = D_fake_loss-D_real_loss
         Wasserstein_D = D_real_loss - D_fake_loss
 
 
