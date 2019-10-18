@@ -102,10 +102,6 @@ for epoch in range(opt.n_epochs):
         D_losses.append(D_loss.item())
 
 
-
-        for p in D.parameters():
-            p.data.clamp_(-0.01,0.01)
-
         if i % 5 == 0:
             for p in D.parameters():
                 p.requires_grad = False
