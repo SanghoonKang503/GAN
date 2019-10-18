@@ -108,10 +108,6 @@ for epoch in range(opt.n_epochs):
             # train generator G
             fake_image = G(z_)
 
-            G_loss=D(fake_image)
-            G_loss=G_loss.mean().mean(0).view(1)
-            G_loss.backward(one)
-
             G_optimizer.step()
 
             G_losses.append(G_loss.item())
