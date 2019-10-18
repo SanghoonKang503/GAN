@@ -31,7 +31,6 @@ parser.add_argument("--n_critic", type=int, default=5, help="Number of training 
 
 opt= parser.parse_args()
 lamda_gp = 10
-
 # put image data into data_loader
 data_dir = 'resized_celebA'  # this path depends on your computer
 train_loader = get_train_loader(data_dir, opt.batch_size, opt.img_size)
@@ -53,9 +52,9 @@ G_optimizer = optim.Adam(G.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 D_optimizer = optim.Adam(D.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 
 # results save folder
-os.mkdir('CelebA_WGAN_results_3', exist_ok=True)
-os.mkdir('CelebA_WGAN_results_3/Random_results', exist_ok=True)
-os.mkdir('CelebA_WGAN_results_3/Fixed_results', exist_ok=True)
+os.makedirs('CelebA_WGAN_results_3', exist_ok=True)
+os.makedirs('CelebA_WGAN_results_3/Random_results', exist_ok=True)
+os.makedirs('CelebA_WGAN_results_3/Fixed_results', exist_ok=True)
 
 train_hist = {}
 train_hist['D_losses'] = []
