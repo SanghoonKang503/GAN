@@ -75,16 +75,22 @@ for epoch in range(opt.n_epochs):
     epoch_start_time = time.time()
     for i, (x_, _) in enumerate(train_loader):
         # Configure input
-        x = Variable(x_.cuda())
+        real_image = Variable(x_.cuda())
 
         # train discriminator D
         D.zero_grad()
 
-        mini_batch = x.shape[0]                                 # image shape
+        mini_batch = real_image.shape[0]                                           # image shape
         z = Variable(torch.randn((mini_batch, 100)).view(-1, 100, 1, 1))  # declare noise z = (image_shape, 100, 1, 1)
         z = Variable(z.cuda())
 
-        
+        # Generate fake image
+        fake_image = G(z)
+
+        real_validity = D(real_image)
+        fake_validity = D(fake_image)
+
+
 
         D_real_loss = D(x_)
         D_real_loss = D_real_loss.mean(0).view(1)
