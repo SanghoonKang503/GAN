@@ -95,14 +95,13 @@ for epoch in range(opt.n_epochs):
         gradient_penalty = calculate_gradient_penalty(D, real_image, fake_image, lamda_gp)
 
 
-        D_loss = D_fake_loss-D_real_loss
-        Wasserstein_D = D_real_loss - D_fake_loss
+        D_loss = -torch.mean(real_validity) + torch.mean(fake_validity) + gradient_penalty
 
-
-        # Discriminator Loss
-
+        D_loss.backward()
         D_optimizer.step()
         D_losses.append(D_loss.item())
+
+
 
         for p in D.parameters():
             p.data.clamp_(-0.01,0.01)
