@@ -80,7 +80,7 @@ for epoch in range(opt.n_epochs):
         real_image = Variable(x_.cuda())
 
         # train discriminator D
-        D.zero_grad()
+        D_optimizer.zero_grad()
 
         mini_batch = real_image.shape[0]                                           # image shape
         z = Variable(torch.randn((mini_batch, 100)).view(-1, 100, 1, 1))  # declare noise z = (image_shape, 100, 1, 1)
@@ -103,7 +103,7 @@ for epoch in range(opt.n_epochs):
 
 
         if i % opt.n_critic == 0:
-            
+
             # train generator G
             G.zero_grad()
 
