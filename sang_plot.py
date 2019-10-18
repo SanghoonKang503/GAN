@@ -4,11 +4,11 @@ import torch
 from torch.autograd import Variable
 
 
-def show_result(num_epoch, z_, show=False, save=False, path='result.png'):
+def show_result(Generator, num_epoch, z_, show=False, save=False, path='result.png'):
 
-    G.eval()
-    test_images = G(z_)
-    G.train()
+    Generator.eval()
+    test_images = Generator(z_)
+    Generator.train()
 
     size_figure_grid = 5
     fig, ax = plt.subplots(size_figure_grid, size_figure_grid, figsize=(5, 5))

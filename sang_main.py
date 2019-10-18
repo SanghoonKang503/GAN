@@ -127,8 +127,8 @@ for epoch in range(opt.n_epochs):
     z_ = torch.randn((5 * 5, 100)).view(-1, 100, 1, 1)
     with torch.no_grad():
         z_ = Variable(z_.cuda())
-    show_result((epoch + 1), z_, save=True, path=p)
-    show_result((epoch + 1), fixed_z_, save=True, path=fixed_p)
+    show_result(G, (epoch + 1), z_, save=True, path=p)
+    show_result(G, (epoch + 1), fixed_z_, save=True, path=fixed_p)
     train_hist['D_losses'].append(torch.mean(torch.FloatTensor(D_losses)))
     train_hist['G_losses'].append(torch.mean(torch.FloatTensor(G_losses)))
     train_hist['per_epoch_ptimes'].append(per_epoch_ptime)
