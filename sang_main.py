@@ -106,13 +106,14 @@ for epoch in range(opt.n_epochs):
         if i % opt.n_critic == 0:
 
             # train generator G
-            fake_image = G(z_)
+            fake_image = G(z)
+            fake_validity = D(fake_image)
 
+            G_loss = -torch.mean(fake_validity)
+
+            G_loss.backward()
             G_optimizer.step()
-
             G_losses.append(G_loss.item())
-
-            Wassestein_Distance.append(Wasserstein_D.item())
 
     epoch_end_time = time.time()
     per_epoch_ptime = epoch_end_time - epoch_start_time
