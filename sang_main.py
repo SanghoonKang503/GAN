@@ -102,7 +102,7 @@ for epoch in range(opt.n_epochs):
         D_losses.append(D_loss.item())
 
 
-        if i % 5 == 0:
+        if i % opt.n_critic == 0:
             for p in D.parameters():
                 p.requires_grad = False
 
