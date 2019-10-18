@@ -75,21 +75,22 @@ for epoch in range(opt.n_epochs):
     epoch_start_time = time.time()
     for i, (x_, _) in enumerate(train_loader):
         # Configure input
-        x_ = Variable(x_.cuda())
+        x = Variable(x_.cuda())
 
         # train discriminator D
         D.zero_grad()
 
-        mini_batch = x_.size()[0]
+        mini_batch = x.shape[0]                                 # image shape
+        z = Variable(torch.randn((mini_batch, 100)).view(-1, 100, 1, 1))  # declare noise z = (image_shape, 100, 1, 1)
+        z = Variable(z.cuda())
+
+        
 
         D_real_loss = D(x_)
         D_real_loss = D_real_loss.mean(0).view(1)
         D_real_loss.backward(one)
 
-        # z_를 N(0,1)의 확률분포에서 (mini_batch, 100)의 형태로 선택하고 (100, 1, 1)로 변형
-        z_ = torch.randn((mini_batch, 100)).view(-1, 100, 1, 1)
-        z_ = Variable(z_.cuda())
-        fake_image = G(z_)
+        fake_image = G(z)
         D_fake_loss = D(fake_image)
         D_fake_loss = D_fake_loss.mean(0).view(1)
         D_fake_loss.backward(mone)
