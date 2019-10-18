@@ -11,7 +11,7 @@ def get_train_loader(data_dir, batch_sizes, image_size):
     ])
     data_dir = 'resized_celebA'  # this path depends on your computer
     dset = datasets.ImageFolder(data_dir, transform)
-    train_loader = torch.utils.data.DataLoader(dset, batch_size=batch_sizes, shuffle=True)
+    train_loader = torch.utils.data.DataLoader(dset, batch_size=batch_sizes, drop_last=True, shuffle=True)
 
     # confrimed input image size!
     temp = plt.imread(train_loader.dataset.imgs[0][0])
