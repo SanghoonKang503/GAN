@@ -86,7 +86,7 @@ def calculate_gradient_penalty(Discriminator, real_images, fake_images, lambda_g
     interpolated = Variable(interpolated, requires_grad=True)
 
     # calculate probability of interpolated examples
-    prob_interpolated = D(interpolated)
+    prob_interpolated = Discriminator(interpolated)
 
     # calculate gradients of probabilities with respect to examples
     gradients = autograd.grad(outputs=prob_interpolated, inputs=interpolated,
