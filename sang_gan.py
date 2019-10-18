@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from torch.autograd import Variable
+from torch import autograd
 
 # G(z)
 # Generate fake image
@@ -71,3 +73,25 @@ def normal_init(m, mean, std):
         m.weight.data.normal_(mean, std)
         m.bias.data.zero_()
 
+
+def calculate_gradient_penalty(Discriminator, real_images, fake_images, lambda_gp):
+    eta = torch.FloatTensor(real_images.size(0), 1, 1, 1).uniform_(0, 1)
+    eta = eta.expand(real_images.size(0), real_images.size(1), real_images.size(2), real_images.size(3))
+    eta = eta.cuda()
+
+    interpolated = eta * real_images + ((1 - eta) * fake_images)
+    interpolated = interpolated.cuda()
+
+    # define it to calculate gradient
+    interpolated = Variable(interpolated, requires_grad=True)
+
+    # calculate probability of interpolated examples
+    prob_interpolated = D(interpolated)
+
+    # calculate gradients of probabilities with respect to examples
+    gradients = autograd.grad(outputs=prob_interpolated, inputs=interpolated,
+                              grad_outputs=torch.ones(prob_interpolated.size()).cuda(),
+                              create_graph=True, retain_graph=True)[0]
+
+    grad_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean() * lambda_gp
+    return grad_penalty
