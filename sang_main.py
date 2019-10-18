@@ -102,14 +102,10 @@ for epoch in range(opt.n_epochs):
         D_losses.append(D_loss.item())
 
         G_optimizer.zero_grad()
-        
+
         if i % opt.n_critic == 0:
 
             # train generator G
-
-            z_ = torch.randn((mini_batch, 100)).view(-1, 100, 1, 1)
-            z_ = Variable(z_.cuda())
-
             fake_image = G(z_)
 
             G_loss=D(fake_image)
