@@ -71,8 +71,7 @@ start_time = time.time()
 for epoch in range(opt.n_epochs):
     D_losses = []
     G_losses = []
-    Wassestein_Distance = []
-
+    
     epoch_start_time = time.time()
     for i, (x_, _) in enumerate(train_loader):
         # Configure input
@@ -117,9 +116,9 @@ for epoch in range(opt.n_epochs):
     epoch_end_time = time.time()
     per_epoch_ptime = epoch_end_time - epoch_start_time
 
-    print('[%d/%d] - epoch time: %.2f, loss_d: %.3f, loss_g: %.3f, Wasserstein length: %.3f'
+    print('[%d/%d] - epoch time: %.2f, loss_d: %.3f, loss_g: %.3f'
           % ((epoch + 1), opt.n_epochs, per_epoch_ptime, torch.mean(torch.FloatTensor(D_losses)),
-    torch.mean(torch.FloatTensor(G_losses)), torch.mean(torch.FloatTensor(Wassestein_Distance))))
+    torch.mean(torch.FloatTensor(G_losses))))
 
     p = 'CelebA_WGAN_results_3/Random_results/CelebA_WGAN_' + str(epoch + 1) + '.png'
     fixed_p = 'CelebA_WGAN_results_3/Fixed_results/CelebA_WGAN_' + str(epoch + 1) + '.png'
