@@ -18,7 +18,8 @@ from sang_utils import *
 
 # training parameters
 parser=argparse.ArgumentParser()
-parser.add_argument("--n_epochs", type=int, default=100, help= "Running Iterations")
+parser.add_argument("--n_epochs", type=int, default=100, help = "Running Iterations")
+parser.add_argument("--latent_dim", type=int, default=100, help = "Latent dimension z")
 parser.add_argument("--batch_size", type=int, default=64, help= "Size of the Batches")
 parser.add_argument("--lr", type=int, default=0.0001, help="Adam Learning rate")
 parser.add_argument("--b1", type=int, default=0.5, help="Momentum of Adam beta1")
@@ -75,7 +76,7 @@ for epoch in range(opt.n_epochs):
     for i, (x_, _) in enumerate(train_loader):
         # Configure input
         x_ = Variable(x_.cuda())
-        
+
         # train discriminator D
         D.zero_grad()
 
