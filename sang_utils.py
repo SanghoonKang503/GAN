@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import torch
 from torchvision import datasets, transforms
-from sang_main import *
+#from sang_main import *
 
 def get_train_loader(data_dir, batch_sizes, image_size):
     # put image data into data_loader
@@ -15,7 +15,7 @@ def get_train_loader(data_dir, batch_sizes, image_size):
 
     # confrimed input image size!
     temp = plt.imread(train_loader.dataset.imgs[0][0])
-    if (temp.shape[0] != opt.img_size) or (temp.shape[0] != opt.img_size):
+    if (temp.shape[0] != image_size) or (temp.shape[0] != image_size):
         raise ValueError('image size is not 64 x 64!')
     
     return train_loader
