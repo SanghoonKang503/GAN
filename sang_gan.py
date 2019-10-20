@@ -11,15 +11,14 @@ class generator(nn.Module):
     # initializers
     def __init__(self):
         super(generator, self).__init__()
-        self.deconv1 = nn.ConvTranspose2d(100, 1024, 4, 1, 0)
-        self.deconv1_bn = nn.BatchNorm2d(1024)
-        self.deconv2 = nn.ConvTranspose2d(1024, 512, 4, 2, 1)
-        self.deconv2_bn = nn.BatchNorm2d(512)
-        self.deconv3 = nn.ConvTranspose2d(512, 256, 4, 2, 1)
-        self.deconv3_bn = nn.BatchNorm2d(256)
-        self.deconv4 = nn.ConvTranspose2d(256, 128, 4, 2, 1)
-        self.deconv4_bn = nn.BatchNorm2d(128)
-        self.deconv5 = nn.ConvTranspose2d(128, 3, 4, 2, 1)
+        self.deconv1 = nn.ConvTranspose2d(100, 128, 4, 1, 0)
+        self.deconv2 = nn.ConvTranspose2d(128, 256, 4, 2, 1)
+        self.deconv2_bn = nn.BatchNorm2d(256)
+        self.deconv3 = nn.ConvTranspose2d(256, 512, 4, 2, 1)
+        self.deconv3_bn = nn.BatchNorm2d(512)
+        self.deconv4 = nn.ConvTranspose2d(512, 1024, 4, 2, 1)
+        self.deconv4_bn = nn.BatchNorm2d(1024)
+        self.deconv5 = nn.ConvTranspose2d(1024, 3, 4, 2, 1)
 
     # weight_init
     def weight_init(self, mean, std):
