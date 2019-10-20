@@ -27,7 +27,7 @@ class generator(nn.Module):
 
     # forward method
     def forward(self, input):
-        x = F.relu(self.deconv1_bn(self.deconv1(input)))
+        x = F.relu(self.deconv1(input))
         x = F.relu(self.deconv2_bn(self.deconv2(x)))
         x = F.relu(self.deconv3_bn(self.deconv3(x)))
         x = F.relu(self.deconv4_bn(self.deconv4(x)))
