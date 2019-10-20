@@ -20,9 +20,9 @@ from sang_utils import *
 
 # training parameters
 parser=argparse.ArgumentParser()
-parser.add_argument("--n_epochs", type=int, default=100, help = "Running Iterations")
+parser.add_argument("--n_epochs", type=int, default=10, help = "Running Iterations")
 parser.add_argument("--latent_dim", type=int, default=100, help = "Latent dimension z")
-parser.add_argument("--batch_size", type=int, default=64, help= "Size of the Batches")
+parser.add_argument("--batch_size", type=int, default=128, help= "Size of the Batches")
 parser.add_argument("--lr", type=int, default=0.0001, help="Adam Learning rate")
 parser.add_argument("--b1", type=int, default=0.5, help="Momentum of Adam beta1")
 parser.add_argument("--b2", type=int, default=0.999, help="Momentum of Adam beta2")
@@ -49,12 +49,14 @@ D.cuda()
 
 # RMSprop optimizer for WGAN
 G_optimizer = optim.Adam(G.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
+lr_sche_G = torch.optim.lr_scheduler.StepLR(G_optimizer, step_size=2, gamma=0.1)
+
 D_optimizer = optim.Adam(D.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 
 # results save folder
-os.makedirs('CelebA_WGAN_results_3', exist_ok=True)
-os.makedirs('CelebA_WGAN_results_3/Random_results', exist_ok=True)
-os.makedirs('CelebA_WGAN_results_3/Fixed_results', exist_ok=True)
+os.makedirs('CelebA_WGAN_results_0', exist_ok=True)
+os.makedirs('CelebA_WGAN_results_0/Random_results', exist_ok=True)
+os.makedirs('CelebA_WGAN_results_0/Fixed_results', exist_ok=True)
 
 train_hist = {}
 train_hist['D_losses'] = []
@@ -71,7 +73,7 @@ start_time = time.time()
 for epoch in range(opt.n_epochs):
     D_losses = []
     G_losses = []
-    
+
     epoch_start_time = time.time()
     for i, (x_, _) in enumerate(train_loader):
         # Configure input
@@ -110,7 +112,8 @@ for epoch in range(opt.n_epochs):
             G_loss = -torch.mean(fake_validity)
 
             G_loss.backward()
-            G_optimizer.step()
+            #G_optimizer.step()
+            lr_sche_G.step()
             G_losses.append(G_loss.item())
 
     epoch_end_time = time.time()
@@ -120,8 +123,8 @@ for epoch in range(opt.n_epochs):
           % ((epoch + 1), opt.n_epochs, per_epoch_ptime, torch.mean(torch.FloatTensor(D_losses)),
     torch.mean(torch.FloatTensor(G_losses))))
 
-    p = 'CelebA_WGAN_results_3/Random_results/CelebA_WGAN_' + str(epoch + 1) + '.png'
-    fixed_p = 'CelebA_WGAN_results_3/Fixed_results/CelebA_WGAN_' + str(epoch + 1) + '.png'
+    p = 'CelebA_WGAN_results_0/Random_results/CelebA_WGAN_' + str(epoch + 1) + '.png'
+    fixed_p = 'CelebA_WGAN_results_0/Fixed_results/CelebA_WGAN_' + str(epoch + 1) + '.png'
 
     z_ = torch.randn((5 * 5, 100)).view(-1, 100, 1, 1)
     with torch.no_grad():
@@ -139,15 +142,15 @@ train_hist['total_ptime'].append(total_ptime)
 print("Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f" % (
 torch.mean(torch.FloatTensor(train_hist['per_epoch_ptimes'])), opt.n_epochs, total_ptime))
 print("Training finish!... save training results")
-torch.save(G.state_dict(), "CelebA_WGAN_results_3/generator_param.pkl")
-torch.save(D.state_dict(), "CelebA_WGAN_results_3/discriminator_param.pkl")
-with open('CelebA_WGAN_results_3/train_hist.pkl', 'wb') as f:
+torch.save(G.state_dict(), "CelebA_WGAN_results_0/generator_param.pkl")
+torch.save(D.state_dict(), "CelebA_WGAN_results_0/discriminator_param.pkl")
+with open('CelebA_WGAN_results_0/train_hist.pkl', 'wb') as f:
     pickle.dump(train_hist, f)
 
-show_train_hist(train_hist, save=True, path='CelebA_WGAN_results_3/CelebA_WGAN_train_hist.png')
+show_train_hist(train_hist, save=True, path='CelebA_WGAN_results_0/CelebA_WGAN_train_hist.png')
 
 images = []
 for e in range(opt.n_epochs):
-    img_name = 'CelebA_WGAN_results_3/Fixed_results/CelebA_WGAN_' + str(e + 1) + '.png'
+    img_name = 'CelebA_WGAN_results_0/Fixed_results/CelebA_WGAN_' + str(e + 1) + '.png'
     images.append(imageio.imread(img_name))
-imageio.mimsave('CelebA_WGAN_results_3/generation_animation.gif', images, fps=5)
+imageio.mimsave('CelebA_WGAN_results_0/generation_animation.gif', images, fps=5)
