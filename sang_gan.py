@@ -40,15 +40,11 @@ class discriminator(nn.Module):
     # initializers
     def __init__(self):
         super(discriminator, self).__init__()
-        self.conv1 = nn.Conv2d(3, 128, 4, 2, 1)
-        self.conv1_bn = nn.BatchNorm2d(128)
-        self.conv2 = nn.Conv2d(128, 256, 4, 2, 1)
-        self.conv2_bn = nn.BatchNorm2d(256)
-        self.conv3 = nn.Conv2d(256, 512, 4, 2, 1)
-        self.conv3_bn = nn.BatchNorm2d(512)
-        self.conv4 = nn.Conv2d(512, 1024, 4, 2, 1)
-        self.conv4_bn = nn.BatchNorm2d(1024)
-        self.conv5 = nn.Conv2d(1024, 1, 4, 1, 0)
+        self.conv1 = nn.Conv2d(3, 1024, 4, 2, 1)
+        self.conv2 = nn.Conv2d(1024, 512, 4, 2, 1)
+        self.conv3 = nn.Conv2d(512, 256, 4, 2, 1)
+        self.conv4 = nn.Conv2d(256, 128, 4, 2, 1)
+        self.conv5 = nn.Conv2d(128, 1, 4, 1, 0)
 
 
     # weight_init
@@ -58,10 +54,10 @@ class discriminator(nn.Module):
 
     # forward method
     def forward(self, input):
-        x = F.leaky_relu(self.conv1_bn(self.conv1(input)), 0.2)
-        x = F.leaky_relu(self.conv2_bn(self.conv2(x)), 0.2)
-        x = F.leaky_relu(self.conv3_bn(self.conv3(x)), 0.2)
-        x = F.leaky_relu(self.conv4_bn(self.conv4(x)), 0.2)
+        x = F.leaky_relu(self.conv1(input), 0.2)
+        x = F.leaky_relu(self.conv2(x), 0.2)
+        x = F.leaky_relu(self.conv3(x), 0.2)
+        x = F.leaky_relu(self.conv4(x), 0.2)
         x = self.conv5(x)
 
         return x
