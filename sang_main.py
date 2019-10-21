@@ -53,7 +53,7 @@ G_optimizer = optim.Adam(G.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 D_optimizer = optim.Adam(D.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
 
 # results save folder
-save_path = 'CelebA_WGAN_results_2'
+save_path = 'CelebA_WGAN-GP_results_2'
 os.makedirs(save_path, exist_ok=True)
 os.makedirs(save_path + '/Random_results', exist_ok=True)
 os.makedirs(save_path + '/Fixed_results', exist_ok=True)
@@ -64,9 +64,15 @@ train_hist['G_losses'] = []
 train_hist['per_epoch_ptimes'] = []
 train_hist['total_ptime'] = []
 
-fixed_z_ = torch.randn((5 * 5, 100)).view(-1, 100, 1, 1)  # fixed noise
+# fixed noise
+z_ = torch.randn((5 * 5, 100)).view(-1, 100, 1, 1)
+with torch.no_grad():
+    z_ = Variable(z_.cuda())
+
+fixed_z_ = torch.randn((5 * 5, 100)).view(-1, 100, 1, 1)
 with torch.no_grad():
     fixed_z_ = Variable(fixed_z_.cuda())
+
 
 print('Training start!')
 start_time = time.time()
@@ -82,7 +88,7 @@ for epoch in range(opt.n_epochs):
         # train discriminator D
         D_optimizer.zero_grad()
 
-        mini_batch = real_image.shape[0]                                           # image shape
+        mini_batch = real_image.shape[0]                                  # image shape
         z = Variable(torch.randn((mini_batch, 100)).view(-1, 100, 1, 1))  # declare noise z = (image_shape, 100, 1, 1)
         z = Variable(z.cuda())
 
@@ -93,7 +99,6 @@ for epoch in range(opt.n_epochs):
         fake_validity = D(fake_image)
 
         gradient_penalty = calculate_gradient_penalty(D, real_image, fake_image, lamda_gp)
-
 
         D_loss = -torch.mean(real_validity) + torch.mean(fake_validity) + gradient_penalty
 
@@ -125,11 +130,9 @@ for epoch in range(opt.n_epochs):
     p = save_path + '/Random_results/CelebA_WGAN-GP_' + str(epoch + 1) + '.png'
     fixed_p = save_path + '/Fixed_results/CelebA_WGAN-GP_' + str(epoch + 1) + '.png'
 
-    z_ = torch.randn((5 * 5, 100)).view(-1, 100, 1, 1)
-    with torch.no_grad():
-        z_ = Variable(z_.cuda())
     show_result(G, (epoch + 1), z_, save=True, path=p)
     show_result(G, (epoch + 1), fixed_z_, save=True, path=fixed_p)
+
     train_hist['D_losses'].append(torch.mean(torch.FloatTensor(D_losses)))
     train_hist['G_losses'].append(torch.mean(torch.FloatTensor(G_losses)))
     train_hist['per_epoch_ptimes'].append(per_epoch_ptime)
@@ -138,10 +141,9 @@ end_time = time.time()
 total_ptime = end_time - start_time
 train_hist['total_ptime'].append(total_ptime)
 
-print("Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f" % (
-torch.mean(torch.FloatTensor(train_hist['per_epoch_ptimes'])), opt.n_epochs, total_ptime))
+print("Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f"
+      %(torch.mean(torch.FloatTensor(train_hist['per_epoch_ptimes'])), opt.n_epochs, total_ptime))
 
 print("Training finish!... save training results")
-
 show_train_hist(train_hist, save=True, path=save_path + '/CelebA_WGAN-GP_train_hist.png')
 make_animation(opt.n_epochs, save_path)
