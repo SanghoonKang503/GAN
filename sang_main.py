@@ -141,16 +141,13 @@ train_hist['total_ptime'].append(total_ptime)
 
 print("Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f" % (
 torch.mean(torch.FloatTensor(train_hist['per_epoch_ptimes'])), opt.n_epochs, total_ptime))
-print("Training finish!... save training results")
-torch.save(G.state_dict(), "CelebA_WGAN_results_0/generator_param.pkl")
-torch.save(D.state_dict(), "CelebA_WGAN_results_0/discriminator_param.pkl")
-with open('CelebA_WGAN_results_0/train_hist.pkl', 'wb') as f:
-    pickle.dump(train_hist, f)
 
-show_train_hist(train_hist, save=True, path='CelebA_WGAN_results_0/CelebA_WGAN_train_hist.png')
+print("Training finish!... save training results")
+
+show_train_hist(train_hist, save=True, path='CelebA_WGAN_results_1/CelebA_WGAN_train_hist.png')
 
 images = []
 for e in range(opt.n_epochs):
-    img_name = 'CelebA_WGAN_results_0/Fixed_results/CelebA_WGAN_' + str(e + 1) + '.png'
+    img_name = 'CelebA_WGAN_results_1/Fixed_results/CelebA_WGAN_' + str(e + 1) + '.png'
     images.append(imageio.imread(img_name))
-imageio.mimsave('CelebA_WGAN_results_0/generation_animation.gif', images, fps=5)
+imageio.mimsave('CelebA_WGAN_results_1/generation_animation.gif', images, fps=5)
