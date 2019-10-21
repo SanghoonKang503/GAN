@@ -40,8 +40,8 @@ G = generator()
 D = discriminator()
 
 # Weight initialization
-G.weight_init(mean=0.0, std=0.02)
-D.weight_init(mean=0.0, std=0.02)
+G.weight_init()
+D.weight_init()
 
 # put G and D in cuda
 G.cuda()

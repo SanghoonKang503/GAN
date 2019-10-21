@@ -21,9 +21,12 @@ class generator(nn.Module):
         self.deconv5 = nn.ConvTranspose2d(1024, 3, 4, 2, 1)
 
     # weight_init
-    def weight_init(self, mean, std):
+    def weight_init(self):
         for m in self._modules:
-            normal_init(self._modules[m], mean, std)
+            #normal_init(self._modules[m], mean, std)
+            if isinstance(m, nn.ConvTranspose2d) or isinstance(m, nn.Conv2d):
+                nn.init.xavier_normal_(m.weight)
+                nn.init.xavier_normal_(m.bias)
 
     # forward method
     def forward(self, input):
@@ -48,9 +51,12 @@ class discriminator(nn.Module):
 
 
     # weight_init
-    def weight_init(self, mean, std):
+    def weight_init(self):
         for m in self._modules:
-            normal_init(self._modules[m], mean, std)
+            #normal_init(self._modules[m], mean, std)
+            if isinstance(m, nn.ConvTranspose2d) or isinstance(m, nn.Conv2d):
+                nn.init.xavier_normal_(m.weight)
+                nn.init.xavier_normal_(m.bias)
 
     # forward method
     def forward(self, input):
