@@ -1,96 +1,154 @@
 import torch
+import os
+import argparse
+import itertools
+import time
 
-def wrapper(param, data_x, data_y, lr_gamma, hidden_dim, layers):
+import torch.optim as optim
 
-    device = param['device']
-    input_dim = param['region_n']
-    n_epochs = param['n_epochs']
-    outputfolder = param['outputfolder']
-    minmax_y = param['minmax_y']
+from sang_utils import *
+from sang_gan import *
+from sang_plot import *
 
-    output_dim = 1  # Output dimension
-    drop_prob = 0.5  # Drop probability during training
-    train_num = 560
-    valid_num = 80
-    total_num = len(data_y)
+parser=argparse.ArgumentParser()
+parser.add_argument("--latent_dim", type=int, default=100, help = "Latent dimension z")
+parser.add_argument("--b1", type=int, default=0.5, help="Momentum of Adam beta1")
+parser.add_argument("--b2", type=int, default=0.999, help="Momentum of Adam beta2")
+parser.add_argument("--img_size", type=int, default=64, help="Size of input Image")
+parser.add_argument("--n_critic", type=int, default=5, help="Number of training step of Discriminator")
+opt= parser.parse_args()
 
-    train_x_tensor, train_y_tensor = get_tensor(
-        device, data_x, data_y, 0, train_num)
-    valid_x_tensor, valid_y_tensor = get_tensor(
-        device, data_x, data_y, train_num+1, train_num+valid_num)
+param = {'num_epochs': [10, 50, 100],
+         'learning_rate': [0.0001, 0.0005, 0.00005],
+         'batch_size' :[64, 128]
+         }
 
-    out_fname = f'hidden_dim_{hidden_dim}_layers_{layers}_lr_gamma_{lr_gamma}'
+product_set = itertools.product(param['num_epochs'],
+                                param['learning_rate'],
+                                param['batch_size']
+                                )
 
-    mynet = RNNClassifier(
-        input_dim, hidden_dim, output_dim, layers, drop_prob).to(device)
 
-    start = time.time()  # Start Learning
-    print("Start Learning " + out_fname)
+def wrapper_(param, epochs, lr, batches):
+    # for save file name
+    epoch_ = param['num_epochs']
+    lr_ = param['learning_rate']
+    bs_ = param['batch_size']
 
-    criterion = torch.nn.MSELoss().to(device)
-    optimizer = torch.optim.Adam(mynet.parameters(), lr=0.001)
-    lr_sche = torch.optim.lr_scheduler.StepLR(
-        optimizer, step_size=100, gamma=lr_gamma)
-    train_loss_list = []
-    valid_loss_list = []
-    for i in range(n_epochs):
-        # Train
-        mynet.train()
-        lr_sche.step()
-        outputs = mynet(train_x_tensor)
-        loss = criterion(outputs, train_y_tensor)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+    data_dir = 'resized_celebA'  # this path depends on your computer
+    train_loader = get_train_loader(data_dir, batches, opt.img_size)
 
-        train_loss_list.append(loss.item())
+    lamda_gp = 10
 
-        # Validation
-        mynet.eval()
-        valid_result = mynet(valid_x_tensor)
-        valid_loss = criterion(valid_result, valid_y_tensor)
-        valid_loss_list.append(valid_loss.item())
-    train_loss_arr = np.array(train_loss_list)
-    valid_loss_arr = np.array(valid_loss_list)
+    G = generator()
+    D = discriminator()
 
-    output_path = f'./figs/{outputfolder}'
-    safe_make_dir(output_path)
-    # Write loss values in csv file
-    write_loss(train_loss_arr, valid_loss_arr, output_path, out_fname)
+    # Weight initialization
+    G.weight_init()
+    D.weight_init()
 
-    # Plot train and validation losses
-    plot_train_val_loss(
-        n_epochs, train_loss_arr, valid_loss_arr, output_path, out_fname,
-        linewidth=0.1, dpi=800, yscale='log', ylim=[0.0001, 10])
+    # put G and D in cuda
+    G.cuda()
+    D.cuda()
 
-    end = time.time()  # Learning Done
-    print(f"Learning Done in {end-start}s")
+    # RMSprop optimizer for WGAN
+    G_optimizer = optim.Adam(G.parameters(), lr=lr, betas=(opt.b1, opt.b2))
+    # lr_sche_G = torch.optim.lr_scheduler.StepLR(G_optimizer, step_size=2, gamma=0.1)
+    D_optimizer = optim.Adam(D.parameters(), lr=lr, betas=(opt.b1, opt.b2))
 
-    # Test
-    mynet.eval()
+    save_path = 'WGAN-GP_'+ 'epoch_' + str(epochs) + '_lr_' + str(lr) + '_batches_'+ str(batches)
+    os.makedirs(save_path, exist_ok=True)
+    os.makedirs(save_path + '/Random_results', exist_ok=True)
+    os.makedirs(save_path + '/Fixed_results', exist_ok=True)
+
+    train_hist = {}
+    train_hist['D_losses'] = []
+    train_hist['G_losses'] = []
+    train_hist['per_epoch_ptimes'] = []
+    train_hist['total_ptime'] = []
+
+    # fixed noise
+    z_ = torch.randn((5 * 5, 100)).view(-1, 100, 1, 1)
     with torch.no_grad():
-        test_x_tensor, test_y_tensor = get_tensor(
-            device, data_x, data_y, train_num+valid_num+1, total_num)
+        z_ = Variable(z_.cuda())
 
-        test_result = mynet(test_x_tensor)
-        test_loss = criterion(test_result, test_y_tensor)
-        print(f"Test Loss: {test_loss.item()}")
-    plot_result(
-        test_y_tensor, test_result, minmax_y, output_path, out_fname)
+    fixed_z_ = torch.randn((5 * 5, 100)).view(-1, 100, 1, 1)
+    with torch.no_grad():
+        fixed_z_ = Variable(fixed_z_.cuda())
 
-criterion = torch.nn.MSELoss().to(device)
-optimizer = torch.optim.Adam(mynet.parameters(), lr=0.001)
-lr_sche = torch.optim.lr_scheduler.StepLR(
-    optimizer, step_size=100, gamma=lr_gamma)
+    print('Training start!')
+    start_time = time.time()
+    for epoch in range(epochs):
+        D_losses = []
+        G_losses = []
 
-param = {'gamma_list': [0.99, 0.975, 0.95],
-         'hidden_dim_list': [200, 300],
-         'layers_list': [3, 4]}
+        epoch_start_time = time.time()
+        for i, (x_, _) in enumerate(train_loader):
+            # Configure input
+            real_image = Variable(x_.cuda())
 
-product_set = itertools.product(
-        param['gamma_list'],
-        param['hidden_dim_list'],
-        param['layers_list'])
+            # train discriminator D
+            D_optimizer.zero_grad()
 
-for lr_ gamma, hidden_dim, layers in product_set:
-    wrapper(param, data_x, data_y, lr_gamma, hidden_dim, layers)
+            mini_batch = real_image.shape[0]  # image shape
+            z = Variable(torch.randn((mini_batch, 100)).view(-1, 100, 1, 1))  # declare noise z = (image_shape, 100, 1, 1)
+            z = Variable(z.cuda())
+
+            # Generate fake image
+            fake_image = G(z)
+
+            real_validity = D(real_image)
+            fake_validity = D(fake_image)
+
+            gradient_penalty = calculate_gradient_penalty(D, real_image, fake_image, lamda_gp)
+
+            D_loss = -torch.mean(real_validity) + torch.mean(fake_validity) + gradient_penalty
+
+            D_loss.backward()
+            D_optimizer.step()
+            D_losses.append(D_loss.item())
+
+            G_optimizer.zero_grad()
+
+            if i % opt.n_critic == 0:
+                # train generator G
+                fake_image = G(z)
+                fake_validity = D(fake_image)
+
+                G_loss = -torch.mean(fake_validity)
+
+                G_loss.backward()
+                G_optimizer.step()
+                # lr_sche_G.step()
+                G_losses.append(G_loss.item())
+
+        epoch_end_time = time.time()
+        per_epoch_ptime = epoch_end_time - epoch_start_time
+
+        print('[%d/%d] - epoch time: %.2f, loss_d: %.3f, loss_g: %.3f'
+              % ((epoch + 1), epochs, per_epoch_ptime, torch.mean(torch.FloatTensor(D_losses)),
+                 torch.mean(torch.FloatTensor(G_losses))))
+
+        p = save_path + '/Random_results/CelebA_WGAN-GP_' + str(epoch + 1) + '.png'
+        fixed_p = save_path + '/Fixed_results/CelebA_WGAN-GP_' + str(epoch + 1) + '.png'
+
+        show_result(G, (epoch + 1), z_, save=True, path=p)
+        show_result(G, (epoch + 1), fixed_z_, save=True, path=fixed_p)
+
+        train_hist['D_losses'].append(torch.mean(torch.FloatTensor(D_losses)))
+        train_hist['G_losses'].append(torch.mean(torch.FloatTensor(G_losses)))
+        train_hist['per_epoch_ptimes'].append(per_epoch_ptime)
+
+    end_time = time.time()
+    total_ptime = end_time - start_time
+    train_hist['total_ptime'].append(total_ptime)
+
+    print("Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f"
+          % (torch.mean(torch.FloatTensor(train_hist['per_epoch_ptimes'])), epochs, total_ptime))
+
+    print("Training finish!... save training results")
+    show_train_hist(train_hist, save=True, path=save_path + '/CelebA_WGAN-GP_train_hist.png')
+    make_animation(epochs, save_path)
+
+for num_epochs, learning_rate, batch_size in product_set:
+    wrapper_(param, num_epochs, learning_rate, batch_size)
