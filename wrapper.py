@@ -9,34 +9,16 @@ import torch.optim as optim
 from sang_utils import *
 from sang_gan import *
 from sang_plot import *
+    
 
-parser=argparse.ArgumentParser()
-parser.add_argument("--latent_dim", type=int, default=100, help = "Latent dimension z")
-parser.add_argument("--b1", type=int, default=0.5, help="Momentum of Adam beta1")
-parser.add_argument("--b2", type=int, default=0.999, help="Momentum of Adam beta2")
-parser.add_argument("--img_size", type=int, default=64, help="Size of input Image")
-parser.add_argument("--n_critic", type=int, default=5, help="Number of training step of Discriminator")
-opt= parser.parse_args()
-
-param = {'num_epochs': [10, 50, 100],
-         'learning_rate': [0.0001, 0.0005, 0.00005],
-         'batch_size' :[64, 128]
-         }
-
-product_set = itertools.product(param['num_epochs'],
-                                param['learning_rate'],
-                                param['batch_size']
-                                )
-
-
-def wrapper_(param, epochs, lr, batches):
+def wrapper_(opt):
     # for save file name
-    epoch_ = param['num_epochs']
-    lr_ = param['learning_rate']
-    bs_ = param['batch_size']
+    epoch_ = opt['num_epochs']
+    lr = opt['learning_rate']
+    bs = opt['batch_size']
 
     data_dir = 'resized_celebA'  # this path depends on your computer
-    train_loader = get_train_loader(data_dir, batches, opt.img_size)
+    train_loader = get_train_loader(data_dir, bs, opt['img_size'])
 
     lamda_gp = 10
 
@@ -52,14 +34,14 @@ def wrapper_(param, epochs, lr, batches):
     D.cuda()
 
     # RMSprop optimizer for WGAN
-    G_optimizer = optim.Adam(G.parameters(), lr=lr, betas=(opt.b1, opt.b2))
-    # lr_sche_G = torch.optim.lr_scheduler.StepLR(G_optimizer, step_size=2, gamma=0.1)
-    D_optimizer = optim.Adam(D.parameters(), lr=lr, betas=(opt.b1, opt.b2))
+    G_optimizer = optim.Adam(G.parameters(), lr=lr, betas=(opt['b1'], opt['b2']))
+    lr_sche_G = torch.optim.lr_scheduler.StepLR(G_optimizer, step_size=10, gamma=0.99)
+    D_optimizer = optim.Adam(D.parameters(), lr=lr, betas=(opt['b1'], opt['b2']))
 
-    save_path = 'WGAN-GP_'+ 'epoch_' + str(epochs) + '_lr_' + str(lr) + '_batches_'+ str(batches)
+    save_path = f'WGAN-GP_epoch_{epochs}_lr_{lr}_batches_{bs_}'
     os.makedirs(save_path, exist_ok=True)
-    os.makedirs(save_path + '/Random_results', exist_ok=True)
-    os.makedirs(save_path + '/Fixed_results', exist_ok=True)
+    os.makedirs(os.path.join(save_path, 'Random_results'), exist_ok=True)
+    os.makedirs(os.path.join(save_path, 'Fixed_results'), exist_ok=True)
 
     train_hist = {}
     train_hist['D_losses'] = []
@@ -110,7 +92,7 @@ def wrapper_(param, epochs, lr, batches):
 
             G_optimizer.zero_grad()
 
-            if i % opt.n_critic == 0:
+            if i % opt['n_critic'] == 0:
                 # train generator G
                 fake_image = G(z)
                 fake_validity = D(fake_image)
@@ -150,5 +132,28 @@ def wrapper_(param, epochs, lr, batches):
     show_train_hist(train_hist, save=True, path=save_path + '/CelebA_WGAN-GP_train_hist.png')
     make_animation(epochs, save_path)
 
-for num_epochs, learning_rate, batch_size in product_set:
-    wrapper_(param, num_epochs, learning_rate, batch_size)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--latent_dim", type=int, default=100, help="Latent dimension z")
+    parser.add_argument("--b1", type=int, default=0.5, help="Momentum of Adam beta1")
+    parser.add_argument("--b2", type=int, default=0.999, help="Momentum of Adam beta2")
+    parser.add_argument("--img_size", type=int, default=64, help="Size of input Image")
+    parser.add_argument("--n_critic", type=int, default=5, help="Number of training step of Discriminator")
+    opt = parser.parse_args()
+    param = opt.__dict__
+    
+    iter_list= {'num_epochs': [10, 50, 100],
+             'learning_rate': [0.0001, 0.0005, 0.00005],
+             'batch_size' :[64, 128]
+             }
+    
+    product_set = itertools.product(iter_list['num_epochs'],
+                                    iter_list['learning_rate'],
+                                    iter_list['batch_size'])
+
+    for num_epochs, learning_rate, batch_size in product_set:
+        param['num_epochs'] = num_epochs
+        param['learning_rate'] = learning_rate
+        param['batch_size'] = batch_size
+        wrapper_(param)
