@@ -50,11 +50,11 @@ def wrapper_(opt):
     train_hist['total_ptime'] = []
 
     # fixed noise
-    z_ = torch.randn((5 * 5, 100)).view(-1, 100, 1, 1)
+    z_ = torch.randn((5 * 5, opt['latent_dim'])).view(-1, opt['latent_dim'], 1, 1)
     with torch.no_grad():
         z_ = Variable(z_.cuda())
 
-    fixed_z_ = torch.randn((5 * 5, 100)).view(-1, 100, 1, 1)
+    fixed_z_ = torch.randn((5 * 5, opt['latent_dim'])).view(-1, opt['latent_dim'], 1, 1)
     with torch.no_grad():
         fixed_z_ = Variable(fixed_z_.cuda())
 
@@ -73,7 +73,7 @@ def wrapper_(opt):
             D_optimizer.zero_grad()
 
             mini_batch = real_image.shape[0]  # image shape
-            z = Variable(torch.randn((mini_batch, 100)).view(-1, 100, 1, 1))  # declare noise z = (image_shape, 100, 1, 1)
+            z = Variable(torch.randn((mini_batch, opt['latent_dim'])).view(-1, opt['latent_dim'], 1, 1))  # declare noise z = (image_shape, 100, 1, 1)
             z = Variable(z.cuda())
 
             # Generate fake image
