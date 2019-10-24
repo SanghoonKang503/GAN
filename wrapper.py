@@ -114,9 +114,6 @@ def wrapper_(opt):
         p = os.path.join(save_path, 'Random_results/CelebA_WGAN-GP_', str(epoch+1), '.png')
         fixed_p = os.path.join(save_path, 'Fixed_results/CelebA_WGAN-GP_', str(epoch+1), '.png')
 
-        p = save_path + '/Random_results/CelebA_WGAN-GP_' + str(epoch + 1) + '.png'
-        fixed_p = save_path + '/Fixed_results/CelebA_WGAN-GP_' + str(epoch + 1) + '.png'
-
         show_result(G, (epoch + 1), z_, save=True, path=p)
         show_result(G, (epoch + 1), fixed_z_, save=True, path=fixed_p)
 
@@ -144,9 +141,9 @@ if __name__ == "__main__":
     opt = parser.parse_args()
     param = opt.__dict__
     
-    iter_list= {'num_epochs': [10, 50, 100],
-             'learning_rate': [0.0001, 0.0005, 0.00005],
-             'batch_size' :[64, 128]
+    iter_list= {'num_epochs': [100],
+             'learning_rate': [0.0005, 0.0003],
+             'batch_size' :[64]
              }
     
     product_set = itertools.product(iter_list['num_epochs'],
