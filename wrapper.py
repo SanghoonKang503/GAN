@@ -1,7 +1,4 @@
-import torch
 import os
-import argparse
-import itertools
 import time
 
 import torch.optim as optim
@@ -13,14 +10,12 @@ from sang_plot import *
 
 def wrapper_(opt):
     # for save file name
-    epoch_ = opt['num_epochs']
+    epoch = opt['num_epochs']
     lr = opt['learning_rate']
     bs = opt['batch_size']
 
     data_dir = 'resized_celebA'  # this path depends on your computer
     train_loader = get_train_loader(data_dir, bs, opt['img_size'])
-
-    lamda_gp = 10
 
     G = generator()
     D = discriminator()
@@ -47,7 +42,6 @@ def wrapper_(opt):
     train_hist = {}
     train_hist['D_losses'] = []
     train_hist['G_losses'] = []
-    train_hist['per_epoch_ptimes'] = []
     train_hist['total_ptime'] = []
 
     # fixed noise
@@ -61,7 +55,7 @@ def wrapper_(opt):
 
     print('Training start!')
     start_time = time.time()
-    for epoch in range(epochs):
+    for epoch in range(epoch):
         D_losses = []
         G_losses = []
 
@@ -83,7 +77,7 @@ def wrapper_(opt):
             real_validity = D(real_image)
             fake_validity = D(fake_image)
 
-            gradient_penalty = calculate_gradient_penalty(D, real_image, fake_image, lamda_gp)
+            gradient_penalty = calculate_gradient_penalty(D, real_image, fake_image, opt['lambda_gp'])
 
             D_loss = -torch.mean(real_validity) + torch.mean(fake_validity) + gradient_penalty
 
@@ -119,7 +113,6 @@ def wrapper_(opt):
 
         train_hist['D_losses'].append(torch.mean(torch.FloatTensor(D_losses)))
         train_hist['G_losses'].append(torch.mean(torch.FloatTensor(G_losses)))
-        train_hist['per_epoch_ptimes'].append(per_epoch_ptime)
 
     end_time = time.time()
     total_ptime = end_time - start_time
@@ -128,30 +121,4 @@ def wrapper_(opt):
     print(f'Total time: {total_ptime}')
     print("Training finish!... save training results")
     show_train_hist(train_hist, save=True, path=save_path + '/CelebA_WGAN-GP_train_hist.png')
-    make_animation(epochs, save_path)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--latent_dim", type=int, default=100, help="Latent dimension z")
-    parser.add_argument("--b1", type=int, default=0.5, help="Momentum of Adam beta1")
-    parser.add_argument("--b2", type=int, default=0.999, help="Momentum of Adam beta2")
-    parser.add_argument("--img_size", type=int, default=64, help="Size of input Image")
-    parser.add_argument("--n_critic", type=int, default=5, help="Number of training step of Discriminator")
-    opt = parser.parse_args()
-    param = opt.__dict__
-    
-    iter_list= {'num_epochs': [100],
-             'learning_rate': [0.0005, 0.0003],
-             'batch_size' :[64]
-             }
-    
-    product_set = itertools.product(iter_list['num_epochs'],
-                                    iter_list['learning_rate'],
-                                    iter_list['batch_size'])
-
-    for num_epochs, learning_rate, batch_size in product_set:
-        param['num_epochs'] = num_epochs
-        param['learning_rate'] = learning_rate
-        param['batch_size'] = batch_size
-        wrapper_(param)
+    make_animation(epoch, save_path)
