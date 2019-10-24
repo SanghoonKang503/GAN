@@ -38,7 +38,7 @@ def wrapper_(opt):
     lr_sche_G = torch.optim.lr_scheduler.StepLR(G_optimizer, step_size=10, gamma=0.99)
     D_optimizer = optim.Adam(D.parameters(), lr=lr, betas=(opt['b1'], opt['b2']))
 
-    save_path = f'WGAN-GP_epoch_{epochs}_lr_{lr}_batches_{bs_}'
+    save_path = f'WGAN-GP_epoch_{epoch}_lr_{lr}_batches_{bs}'
     os.makedirs(save_path, exist_ok=True)
     os.makedirs(os.path.join(save_path, 'Random_results'), exist_ok=True)
     os.makedirs(os.path.join(save_path, 'Fixed_results'), exist_ok=True)
@@ -107,9 +107,7 @@ def wrapper_(opt):
         epoch_end_time = time.time()
         per_epoch_ptime = epoch_end_time - epoch_start_time
 
-        print('[%d/%d] - epoch time: %.2f, loss_d: %.3f, loss_g: %.3f'
-              % ((epoch + 1), epochs, per_epoch_ptime, torch.mean(torch.FloatTensor(D_losses)),
-                 torch.mean(torch.FloatTensor(G_losses))))
+        print(f'{epoch+1}/{epoch} - epoch time: {per_epoch_ptime}, loss_D: {torch.mean(torch.FloatTensor(D_losses))}, loss_G: {torch.mean(torch.FloatTensor(G_losses))}')
 
         p = save_path + '/Random_results/CelebA_WGAN-GP_' + str(epoch + 1) + '.png'
         fixed_p = save_path + '/Fixed_results/CelebA_WGAN-GP_' + str(epoch + 1) + '.png'
@@ -125,9 +123,7 @@ def wrapper_(opt):
     total_ptime = end_time - start_time
     train_hist['total_ptime'].append(total_ptime)
 
-    print("Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f"
-          % (torch.mean(torch.FloatTensor(train_hist['per_epoch_ptimes'])), epochs, total_ptime))
-
+    print(f'Total time: {total_ptime}')
     print("Training finish!... save training results")
     show_train_hist(train_hist, save=True, path=save_path + '/CelebA_WGAN-GP_train_hist.png')
     make_animation(epochs, save_path)
