@@ -111,6 +111,9 @@ def wrapper_(opt):
 
         print(f'{epoch+1}/{epoch} - epoch time: {per_epoch_ptime}, loss_D: {torch.mean(torch.FloatTensor(D_losses))}, loss_G: {torch.mean(torch.FloatTensor(G_losses))}')
 
+        p = os.path.join(save_path, 'Random_results/CelebA_WGAN-GP_', str(epoch+1), '.png')
+        fixed_p = os.path.join(save_path, 'Fixed_results/CelebA_WGAN-GP_', str(epoch+1), '.png')
+
         p = save_path + '/Random_results/CelebA_WGAN-GP_' + str(epoch + 1) + '.png'
         fixed_p = save_path + '/Fixed_results/CelebA_WGAN-GP_' + str(epoch + 1) + '.png'
 
