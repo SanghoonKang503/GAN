@@ -33,10 +33,11 @@ def wrapper_(opt):
     G.cuda()
     D.cuda()
 
-    # RMSprop optimizer for WGAN
+    # Adam optimizer for WGAN-GP
     G_optimizer = optim.Adam(G.parameters(), lr=lr, betas=(opt['b1'], opt['b2']))
-    lr_sche_G = torch.optim.lr_scheduler.StepLR(G_optimizer, step_size=10, gamma=0.99)
     D_optimizer = optim.Adam(D.parameters(), lr=lr, betas=(opt['b1'], opt['b2']))
+    # lr_sche_G = torch.optim.lr_scheduler.StepLR(G_optimizer, step_size=10, gamma=0.99)
+    # lr_sche_D = torch.optim.lr_scheduler.StepLR(D_optimizer, step_size=10, gamma=0.99)
 
     save_path = f'WGAN-GP_epoch_{epoch}_lr_{lr}_batches_{bs}'
     os.makedirs(save_path, exist_ok=True)
@@ -88,6 +89,7 @@ def wrapper_(opt):
 
             D_loss.backward()
             D_optimizer.step()
+            # lr_sche_D.step()
             D_losses.append(D_loss.item())
 
             G_optimizer.zero_grad()
