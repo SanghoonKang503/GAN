@@ -39,7 +39,7 @@ def wrapper_(opt):
     # lr_sche_G = torch.optim.lr_scheduler.StepLR(G_optimizer, step_size=10, gamma=0.99)
     # lr_sche_D = torch.optim.lr_scheduler.StepLR(D_optimizer, step_size=10, gamma=0.99)
 
-    save_path = f'WGAN-GP_epoch_{epochs}_lr_{lr}_batches_{bs}'
+    save_path = f'Cifar10_WGAN-GP_epoch_{epochs}_lr_{lr}_batches_{bs}'
     os.makedirs(save_path, exist_ok=True)
     os.makedirs(os.path.join(save_path, 'Random_results'), exist_ok=True)
     os.makedirs(os.path.join(save_path, 'Fixed_results'), exist_ok=True)
