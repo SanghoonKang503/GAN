@@ -14,8 +14,14 @@ def wrapper_(opt):
     lr = opt['learning_rate']
     bs = opt['batch_size']
 
-    data_dir = 'resized_celebA'  # this path depends on your computer
-    train_loader = get_train_loader(data_dir, bs, opt['img_size'])
+
+    if opt['dataset'] == "celebA":
+        data_dir = 'resized_celebA'  # this path depends on your computer
+        train_loader = get_celebA_loader(data_dir, bs, opt['img_size'])
+
+    elif opt['dataset'] == "cifar10":
+        train_loader = get_cifar10_loader(bs, opt['img_size'])
+
 
     G = generator()
     D = discriminator()
