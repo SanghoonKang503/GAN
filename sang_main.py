@@ -1,7 +1,7 @@
 import argparse
 import itertools
 
-from wrapper import *
+from sang_wrapper import *
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
