@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import itertools
 import imageio
+import os
 import torch
 from torch.autograd import Variable
 
@@ -57,9 +58,9 @@ def show_train_hist(hist, show=False, save=False, path='Train_hist.png'):
     else:
         plt.close()
 
-def make_animation(epochs, path):
+def make_animation(epochs, paths):
     images=[]
     for e in range(epochs):
-        img_name = path + '/Fixed_results/CelebA_WGAN_' + str(e + 1) + '.png'
+        img_name = os.path.join(paths, '/Fixed_results/CelebA_WGAN_' + str(e + 1) + '.png')
         images.append(imageio.imread(img_name))
-    imageio.mimsave(path + '/generation_animation.gif', images, fps=5)
+    imageio.mimsave(paths + '/generation_animation.gif', images, fps=5)
