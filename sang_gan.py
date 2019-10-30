@@ -29,8 +29,8 @@ class generator(nn.Module):
                 nn.init.xavier_normal_(m.bias)
 
     # forward method
-    def forward(self, input):
-        x = F.relu(self.deconv1(input))
+    def forward(self, inputs):
+        x = F.relu(self.deconv1(inputs))
         x = F.relu(self.deconv2_bn(self.deconv2(x)))
         x = F.relu(self.deconv3_bn(self.deconv3(x)))
         x = F.relu(self.deconv4_bn(self.deconv4(x)))
@@ -59,8 +59,8 @@ class discriminator(nn.Module):
                 nn.init.xavier_normal_(m.bias)
 
     # forward method
-    def forward(self, input):
-        x = F.leaky_relu(self.conv1(input), 0.2)
+    def forward(self, inputs):
+        x = F.leaky_relu(self.conv1(inputs), 0.2)
         x = F.leaky_relu(self.conv2(x), 0.2)
         x = F.leaky_relu(self.conv3(x), 0.2)
         x = F.leaky_relu(self.conv4(x), 0.2)
