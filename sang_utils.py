@@ -25,10 +25,11 @@ def get_cifar10_loader(batch_sizes, image_size):
     train_loader = torch.utils.data.DataLoader(datasets.CIFAR10("../../data/mnist",
                                                                 train=True,
                                                                 download=True,
-                                                                transform=transforms.Compose(transforms.Resize(image_size),
-                                                                                             transforms.ToTensor(),
-                                                                                             transforms.Normalize(mean=(0.5,0.5,0.5), std=(0.5,0.5,0.5))),
-                                                                ),
+                                                                transform=transforms.Compose([
+                                                                    transforms.Resize(image_size),
+                                                                    transforms.ToTensor(),
+                                                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                                                                ])),
                                                batch_size=batch_sizes, drop_last=True, shuffle=True)
 
     # confrimed input image size!
