@@ -10,7 +10,7 @@ from sang_plot import *
 
 def wrapper_(opt):
     # for save file name
-    epoch = opt['num_epochs']
+    epochs = opt['num_epochs']
     lr = opt['learning_rate']
     bs = opt['batch_size']
 
@@ -34,7 +34,7 @@ def wrapper_(opt):
     # lr_sche_G = torch.optim.lr_scheduler.StepLR(G_optimizer, step_size=10, gamma=0.99)
     # lr_sche_D = torch.optim.lr_scheduler.StepLR(D_optimizer, step_size=10, gamma=0.99)
 
-    save_path = f'WGAN-GP_epoch_{epoch}_lr_{lr}_batches_{bs}'
+    save_path = f'WGAN-GP_epoch_{epochs}_lr_{lr}_batches_{bs}'
     os.makedirs(save_path, exist_ok=True)
     os.makedirs(os.path.join(save_path, 'Random_results'), exist_ok=True)
     os.makedirs(os.path.join(save_path, 'Fixed_results'), exist_ok=True)
@@ -104,10 +104,10 @@ def wrapper_(opt):
         epoch_end_time = time.time()
         per_epoch_ptime = epoch_end_time - epoch_start_time
 
-        print(f'{epoch+1}/{epoch} - epoch time: {per_epoch_ptime}, loss_D: {torch.mean(torch.FloatTensor(D_losses))}, loss_G: {torch.mean(torch.FloatTensor(G_losses))}')
+        print(f'[{epoch+1}/{epochs}] - epoch time: {per_epoch_ptime}, loss_D: {torch.mean(torch.FloatTensor(D_losses))}, loss_G: {torch.mean(torch.FloatTensor(G_losses))}')
 
-        p = os.path.join(save_path, 'Random_results/CelebA_WGAN-GP_', str(epoch+1), '.png')
-        fixed_p = os.path.join(save_path, 'Fixed_results/CelebA_WGAN-GP_', str(epoch+1), '.png')
+        p = os.path.join(save_path, 'Random_results/CelebA_WGAN-GP_'+str(epoch+1)+'.png')
+        fixed_p = os.path.join(save_path, 'Fixed_results/CelebA_WGAN-GP_'+str(epoch+1)+'.png')
 
         show_result(G, (epoch + 1), z_, save=True, path=p)
         show_result(G, (epoch + 1), fixed_z_, save=True, path=fixed_p)
