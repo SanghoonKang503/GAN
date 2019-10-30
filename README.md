@@ -26,3 +26,6 @@ In 'sang_main.py', Some hyperparameter which can changed by users included in pa
 
 Users can change the 'iter_list' to shuffle in function 'wrapper'
 > function 'wrapper' runs with the set of 'iter_list' automatically. 
+
+# Generated images
+<img src="/WGAN-GP_epoch_100_lr_0.0005_batches_64/Random_results/CelebA_WGAN-GP_93.jpg" width="40%" height="30%" title="ABC" alt="RubberDuck"></img>
