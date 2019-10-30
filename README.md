@@ -12,5 +12,6 @@ wrapper.py     : training with parameters
 
 # Usage
 
-> Some hyperparameters which can changed by users included in parser. 
+> Some hyperparameter which can changed by users included in parser. 
+
 > User can change the 'iter_list' to shuffle in function 'wrapper'
