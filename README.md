@@ -28,4 +28,5 @@ Users can change the 'iter_list' to shuffle in function 'wrapper'
 > function 'wrapper' runs with the set of 'iter_list' automatically. 
 
 # Generated images
-<img src="/WGAN-GP_epoch_100_lr_0.0005_batches_64/Random_results/CelebA_WGAN-GP_93.jpg" width="40%" height="30%" title="ABC" alt="RubberDuck"></img>
+![CelebA_WGAN-GP_93](https://user-images.githubusercontent.com/33616377/67831745-a22f9d00-fb22-11e9-90de-10b3d11a9a45.png)
+
