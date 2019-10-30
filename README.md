@@ -8,5 +8,9 @@ sang_main.py   : main file of the code
 sang_plot.py   : functions of plotting generator & discriminator loss, generate images, animation of generate images  
 sang_utils.py  : dataloader of CelebA
 wrapper.py     : training with parameters
-
 ```
+
+# Usage
+
+> Some hyperparameters which can changed by users included in parser. 
+> User can change the 'iter_list' to shuffle in function 'wrapper'
