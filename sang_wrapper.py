@@ -14,7 +14,6 @@ def wrapper_(opt):
     lr = opt['learning_rate']
     bs = opt['batch_size']
 
-
     if opt['dataset'] == "celebA":
         data_dir = 'resized_celebA'  # this path depends on your computer
         train_loader = get_celebA_loader(data_dir, bs, opt['img_size'])

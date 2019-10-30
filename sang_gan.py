@@ -11,14 +11,14 @@ class generator(nn.Module):
     # initializers
     def __init__(self):
         super(generator, self).__init__()
-        self.deconv1 = nn.ConvTranspose2d(100, 128, 4, 1, 0)
-        self.deconv2 = nn.ConvTranspose2d(128, 256, 4, 2, 1)
+        self.deconv1 = nn.ConvTranspose2d(100, 512, 4, 1, 0)
+        self.deconv2 = nn.ConvTranspose2d(512, 256, 4, 2, 1)
         self.deconv2_bn = nn.BatchNorm2d(256)
-        self.deconv3 = nn.ConvTranspose2d(256, 512, 4, 2, 1)
-        self.deconv3_bn = nn.BatchNorm2d(512)
-        self.deconv4 = nn.ConvTranspose2d(512, 1024, 4, 2, 1)
-        self.deconv4_bn = nn.BatchNorm2d(1024)
-        self.deconv5 = nn.ConvTranspose2d(1024, 3, 4, 2, 1)
+        self.deconv3 = nn.ConvTranspose2d(256, 128, 4, 2, 1)
+        self.deconv3_bn = nn.BatchNorm2d(128)
+        self.deconv4 = nn.ConvTranspose2d(128, 64, 4, 2, 1)
+        self.deconv4_bn = nn.BatchNorm2d(64)
+        self.deconv5 = nn.ConvTranspose2d(64, 3, 4, 2, 1)
 
     # weight_init
     def weight_init(self):
@@ -43,11 +43,11 @@ class discriminator(nn.Module):
     # initializers
     def __init__(self):
         super(discriminator, self).__init__()
-        self.conv1 = nn.Conv2d(3, 1024, 4, 2, 1)
-        self.conv2 = nn.Conv2d(1024, 512, 4, 2, 1)
-        self.conv3 = nn.Conv2d(512, 256, 4, 2, 1)
-        self.conv4 = nn.Conv2d(256, 128, 4, 2, 1)
-        self.conv5 = nn.Conv2d(128, 1, 4, 1, 0)
+        self.conv1 = nn.Conv2d(3, 64, 4, 2, 1)
+        self.conv2 = nn.Conv2d(64, 128, 4, 2, 1)
+        self.conv3 = nn.Conv2d(128, 256, 4, 2, 1)
+        #self.conv4 = nn.Conv2d(256, 128, 4, 2, 1)
+        self.conv4 = nn.Conv2d(256, 1, 4, 1, 0)
 
 
     # weight_init
@@ -63,8 +63,8 @@ class discriminator(nn.Module):
         x = F.leaky_relu(self.conv1(inputs), 0.2)
         x = F.leaky_relu(self.conv2(x), 0.2)
         x = F.leaky_relu(self.conv3(x), 0.2)
-        x = F.leaky_relu(self.conv4(x), 0.2)
-        x = self.conv5(x)
+        #x = F.leaky_relu(self.conv4(x), 0.2)
+        x = self.conv4(x)
 
         return x
 
