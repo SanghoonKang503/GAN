@@ -12,6 +12,17 @@ wrapper.py     : training with parameters
 
 # Usage
 
-> Some hyperparameter which can changed by users included in parser. 
+In 'sang_main.py', Some hyperparameter which can changed by users included in parser. 
+> 'latent_dim' : input of latent vector in Generator, normally defaults at 100.   
 
-> User can change the 'iter_list' to shuffle in function 'wrapper'
+> 'b1, b2'     : Adam optimizer parameters (beta 1,2). 
+
+> 'img_size'   : training image size.
+ 
+> 'n_critic'   : number of discriminator iteration after that, generator updates one time
+
+> 'lambda_gp'  : gradient descent parameter
+
+
+Users can change the 'iter_list' to shuffle in function 'wrapper'
+> function 'wrapper' runs with the set of 'iter_list' automatically. 
