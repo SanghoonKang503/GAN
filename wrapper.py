@@ -45,17 +45,13 @@ def wrapper_(opt):
     train_hist['total_ptime'] = []
 
     # fixed noise
-    z_ = torch.randn((5 * 5, opt['latent_dim'])).view(-1, opt['latent_dim'], 1, 1)
-    with torch.no_grad():
-        z_ = Variable(z_.cuda())
-
     fixed_z_ = torch.randn((5 * 5, opt['latent_dim'])).view(-1, opt['latent_dim'], 1, 1)
     with torch.no_grad():
         fixed_z_ = Variable(fixed_z_.cuda())
 
     print('Training start!')
     start_time = time.time()
-    for epoch in range(epoch):
+    for epoch in range(epochs):
         D_losses = []
         G_losses = []
 
@@ -99,6 +95,11 @@ def wrapper_(opt):
                 G_optimizer.step()
                 # lr_sche_G.step()
                 G_losses.append(G_loss.item())
+
+        # For random generator images
+        z_ = torch.randn((5 * 5, opt['latent_dim'])).view(-1, opt['latent_dim'], 1, 1)
+        with torch.no_grad():
+            z_ = Variable(z_.cuda())
 
         epoch_end_time = time.time()
         per_epoch_ptime = epoch_end_time - epoch_start_time
