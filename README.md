@@ -28,8 +28,8 @@ In 'sang_main.py', Some hyperparameter which can changed by users included in pa
 6. 'lambda_gp'  : gradient descent parameter
 
 
-User runs the 'sang_main.py' with changing the list in 'iter_list' 
--> function 'wrapper' runs with the set of 'iter_list' automatically. 
+User runs the 'sang_main.py' with changing the list in 'iter_list'. Function 'wrapper' runs with the set of 'iter_list' automatically. 
+
 
 # Generated images
 ![CelebA_WGAN-GP_93](https://user-images.githubusercontent.com/33616377/67831745-a22f9d00-fb22-11e9-90de-10b3d11a9a45.png)
